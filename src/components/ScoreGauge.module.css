@@ -1,0 +1,45 @@
+.wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+}
+
+.scoreText {
+  fill: var(--text);
+  font-family: var(--font-mono);
+  font-size: 34px;
+  font-weight: 600;
+}
+
+.scoreMax {
+  fill: var(--text-faint);
+  font-family: var(--font-mono);
+  font-size: 12px;
+}
+
+.progress {
+  transition: stroke-dasharray 0.5s ease;
+}
+
+.band {
+  font-size: 12px;
+  font-weight: 600;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 3px 10px;
+  border-radius: 999px;
+}
+
+.good {
+  color: var(--score-good);
+  background: rgba(79, 214, 168, 0.12);
+}
+.warn {
+  color: var(--score-warn);
+  background: rgba(255, 180, 84, 0.12);
+}
+.critical {
+  color: var(--score-critical);
+  background: rgba(255, 107, 107, 0.12);
+}
