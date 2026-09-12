@@ -1,16 +1,10 @@
 import { useCallback, useRef, useState } from 'react';
 import { CodeEditor } from './components/CodeEditor';
-import { ResultsPanel } from './components/ResultsPanel';
-import { Sandbox } from './sandbox/Sandbox';
-import { analyzeStatic } from './analysis/staticAnalyzer';
-import { instrumentCode } from './analysis/transform';
-import { aggregateRenderEvents } from './analysis/aggregate';
-import { computeScore } from './analysis/scoring';
-import { buildRecommendations } from './analysis/recommendations';
+
 import styles from './App.module.css';
 
-const STARTER_CODE = 
-`import { useState } from 'react';
+const STARTER_CODE =
+  `import { useState } from 'react';
 
 function ExpensiveList({ items }) {
   // chained array ops recomputed on every render
@@ -43,68 +37,9 @@ export default function App() {
 
 export function App() {
   const [code, setCode] = useState(STARTER_CODE);
+  /**entire code is a state variable */
   const [status, setStatus] = useState('idle'); // idle | analyzing | error | results
   const [error, setError] = useState(null);
-  const [report, setReport] = useState(null);
-  const [runId, setRunId] = useState(0);
-  const [instrumented, setInstrumented] = useState(null);
-  const pendingStaticIssues = useRef([]);
-
-  const handleAnalyze = useCallback(() => {
-    setReport(null);
-    setError(null);
-
-    const staticResult = analyzeStatic(code);
-    if (staticResult.error) {
-      setStatus('error');
-      setError({
-        title: 'Syntax error',
-        message: staticResult.error.message,
-        line: staticResult.error.line,
-        column: staticResult.error.column,
-      });
-      return;
-    }
-
-    const instrumentResult = instrumentCode(code);
-    if (instrumentResult.error) {
-      setStatus('error');
-      setError({
-        title: 'Could not analyze this code',
-        message: instrumentResult.error.message,
-        line: instrumentResult.error.line,
-        column: instrumentResult.error.column,
-      });
-      return;
-    }
-
-    pendingStaticIssues.current = staticResult.issues;
-    setInstrumented(instrumentResult);
-    setStatus('analyzing');
-    setRunId((id) => id + 1);
-  }, [code]);
-
-  const handleSettled = useCallback((events) => {
-    const renderStats = aggregateRenderEvents(events);
-    const staticIssues = pendingStaticIssues.current;
-    const { score, deductions } = computeScore({ staticIssues, renderStats });
-    const recommendations = buildRecommendations({ staticIssues, renderStats });
-    setReport({ score, deductions, staticIssues, renderStats, recommendations });
-    setStatus('results');
-  }, []);
-
-  const handleRuntimeError = useCallback((err) => {
-    setStatus('error');
-    setError({
-      title: 'Runtime error while rendering',
-      message: err && err.message ? err.message : String(err),
-      line: null,
-      column: null,
-    });
-  }, []);
-
-  const errorMarker =
-    status === 'error' && error && error.line ? { line: error.line, column: error.column, message: error.message } : null;
 
   return (
     <div className={styles.app}>
@@ -122,26 +57,16 @@ export function App() {
         <div className={styles.editorCol}>
           <div className={styles.editorToolbar}>
             <span className={styles.editorLabel}>Input</span>
-            <button className={styles.analyzeBtn} onClick={handleAnalyze} disabled={status === 'analyzing'}>
+            <button className={styles.analyzeBtn} onClick={() => { }} disabled={status === 'analyzing'}>
               {status === 'analyzing' ? 'Analyzing…' : 'Analyze'}
             </button>
           </div>
-          <CodeEditor value={code} onChange={setCode} errorMarker={errorMarker} />
+          <CodeEditor value={code} setCode={setCode} />
         </div>
 
-        <div className={styles.resultsCol}>
-          <ResultsPanel status={status} error={error} report={report} />
-        </div>
       </main>
 
-      {status === 'analyzing' && instrumented ? (
-        <Sandbox
-          runId={runId}
-          instrumented={instrumented}
-          onSettled={handleSettled}
-          onRuntimeError={handleRuntimeError}
-        />
-      ) : null}
+
     </div>
   );
 }
