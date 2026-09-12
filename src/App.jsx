@@ -1,5 +1,7 @@
-import { useCallback, useRef, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { CodeEditor } from './components/CodeEditor';
+import { ResultsPanel } from './components/ResultsPanel';
+
 
 import styles from './App.module.css';
 
@@ -37,9 +39,31 @@ export default function App() {
 
 export function App() {
   const [code, setCode] = useState(STARTER_CODE);
-  /**entire code is a state variable */
-  const [status, setStatus] = useState('idle'); // idle | analyzing | error | results
+  const [status, setStatus] = useState('error'); // idle | analyzing | error | results
   const [error, setError] = useState(null);
+  const [results, setResults] = useState(null);
+
+  const handleAnalyze = useCallback(() => {
+    if (!code.trim()) {
+      setError(new Error('Please enter some React code to analyze.'));
+      setStatus('error');
+      return;
+    }
+
+    setStatus('analyzing');
+    setError(null);
+
+    // Initial placeholder transition before static analysis engine is attached
+    setTimeout(() => {
+      try {
+        setResults({ timestamp: Date.now() });
+        setStatus('results');
+      } catch (err) {
+        setError(err);
+        setStatus('error');
+      }
+    }, 2000);
+  }, [code]);
 
   return (
     <div className={styles.app}>
@@ -57,16 +81,21 @@ export function App() {
         <div className={styles.editorCol}>
           <div className={styles.editorToolbar}>
             <span className={styles.editorLabel}>Input</span>
-            <button className={styles.analyzeBtn} onClick={() => { }} disabled={status === 'analyzing'}>
+            <button
+              className={styles.analyzeBtn}
+              onClick={handleAnalyze}
+              disabled={status === 'analyzing'}
+            >
               {status === 'analyzing' ? 'Analyzing…' : 'Analyze'}
             </button>
           </div>
           <CodeEditor value={code} setCode={setCode} />
         </div>
 
+        <div className={styles.resultsCol}>
+          <ResultsPanel status={status} error={error} results={results} />
+        </div>
       </main>
-
-
     </div>
   );
 }

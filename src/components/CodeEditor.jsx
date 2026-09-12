@@ -1,4 +1,3 @@
-import { useEffect, useRef } from 'react';
 import Editor from '@monaco-editor/react';
 import styles from './CodeEditor.module.css';
 
