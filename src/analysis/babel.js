@@ -1,41 +1,46 @@
 import Babel from '@babel/standalone';
 
-/**Babel is a tool that can understand
- *  JavaScript/React code. */
-const parserPkg = Babel.packages.parser;
 /**
- * Babel contains a parser so this means 
- * Give me Babel's parser so I can use it.
+ * Babel is a tool that can understand
+ * JavaScript/React code.
+ */
+const parserPkg = Babel.packages.parser;
+
+/**
+ * Babel contains a parser, so this gives us
+ * Babel's parser to parse JavaScript/React code.
  */
 const PARSE_PLUGINS = [
   'jsx',
   'classProperties',
   'objectRestSpread',
   'optionalChaining',
+  'nullishCoalescingOperator',
   'logicalAssignment',
   'topLevelAwait',
 ];
+
 /**
- * 
-This code uses Babel to parse JavaScript and React (JSX) code and
- convert it into an Abstract Syntax Tree (AST). It supports modern 
- JavaScript features such as optional chaining, object spread,
-  nullish coalescing, and JSX. The parseCode() function takes the 
-  source code as input and returns its AST, which can then be 
-  inspected by other parts of the application to understand and
-   analyze the code structure. If the code contains a syntax error, 
-the parser throws an error instead of trying to continue.
+ * This function takes JavaScript/React source code
+ * and converts it into an Abstract Syntax Tree (AST).
+ *
+ * The AST is a tree-like structure that represents
+ * the code in a structured format, which allows us
+ * to inspect and analyze the code.
+ *
+ * If the code contains a syntax error, Babel throws an error.
  */
 export function parseCode(code) {
   return parserPkg.parse(code, {
-    sourceType: 'module',//Treat this as a JavaScript module so import React from "react" ,export default App; are valid
-    plugins: PARSE_PLUGINS,//tells Babel to support the JavaScript/React features we listed earlier.
-    errorRecovery: false // If the code has a syntax error, don't try to continue. Throw an error.
+    // Treat the code as a JavaScript module,
+    // so import/export statements are supported.
+    sourceType: 'module',
+
+    // Tell Babel which JavaScript/React features to support.
+    plugins: PARSE_PLUGINS,
+
+    // If there is a syntax error, throw an error
+    // instead of trying to recover.
+    errorRecovery: false,
   });
 }
-/**
- * Babel takes your code and parses it. 
- * It returns an Abstract Syntax Tree (AST).
- * In simple terms, an AST is a tree-like structure that 
- * represents the code in a structured format
- */
