@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import { CodeEditor } from './components/CodeEditor';
 import { ResultsPanel } from './components/ResultsPanel';
-
+import { parseCode } from './analysis/babel';
 
 import styles from './App.module.css';
 
@@ -39,7 +39,7 @@ export default function App() {
 
 export function App() {
   const [code, setCode] = useState(STARTER_CODE);
-  const [status, setStatus] = useState('error'); // idle | analyzing | error | results
+  const [status, setStatus] = useState('idle'); // idle | analyzing | error | results
   const [error, setError] = useState(null);
   const [results, setResults] = useState(null);
 
@@ -53,16 +53,18 @@ export function App() {
     setStatus('analyzing');
     setError(null);
 
-    // Initial placeholder transition before static analysis engine is attached
-    setTimeout(() => {
-      try {
-        setResults({ timestamp: Date.now() });
-        setStatus('results');
-      } catch (err) {
-        setError(err);
-        setStatus('error');
-      }
-    }, 2000);
+    // Parse the code using Babel into an AST
+    try {
+      const ast = parseCode(code);
+      setResults({
+        timestamp: Date.now(),
+        statementCount: ast.program?.body?.length ?? 0,
+      });
+      setStatus('results');
+    } catch (err) {
+      setError(err);
+      setStatus('error');
+    }
   }, [code]);
 
   return (

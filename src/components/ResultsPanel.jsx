@@ -36,13 +36,13 @@ export function ResultsPanel({ status, error, results }) {
           <div className={styles.successHeader}>
             <div className={styles.successTitle}>
               <span>⚡</span>
-              <span>Diagnostics Complete</span>
+              <span>AST Parsed Successfully</span>
             </div>
-            <span className={styles.successBadge}>Ready for Phase 2</span>
+            <span className={styles.successBadge}>Babel Parser Connected</span>
           </div>
           <div className={styles.placeholderNote}>
-            Pipeline ran successfully. Next step: connect the static AST analyzer to detect
-            anti-patterns (inline callbacks, expensive loops, unmemoized props).
+            Source code was successfully parsed into a Babel Abstract Syntax Tree (AST).
+            Found {results.statementCount ?? 0} top-level statement{results.statementCount === 1 ? '' : 's'}.
           </div>
         </div>
       </div>
