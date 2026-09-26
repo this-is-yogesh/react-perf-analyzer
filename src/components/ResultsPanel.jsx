@@ -44,6 +44,28 @@ export function ResultsPanel({ status, error, results }) {
             Source code was successfully parsed into a Babel Abstract Syntax Tree (AST).
             Found {results.statementCount ?? 0} top-level statement{results.statementCount === 1 ? '' : 's'}.
           </div>
+
+          <div className={styles.componentSection}>
+            <div className={styles.componentSectionTitle}>
+              Detected React Components ({results.components?.length ?? 0})
+            </div>
+            {results.components && results.components.length > 0 ? (
+              <div className={styles.componentList}>
+                {results.components.map((comp) => (
+                  <div key={comp.name} className={styles.componentItem}>
+                    <span className={styles.componentName}>&lt;{comp.name} /&gt;</span>
+                    {comp.line && (
+                      <span className={styles.componentLine}>Line {comp.line}</span>
+                    )}
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className={styles.placeholderNote}>
+                No React components found. Component names must start with a capital letter (PascalCase).
+              </div>
+            )}
+          </div>
         </div>
       </div>
     );

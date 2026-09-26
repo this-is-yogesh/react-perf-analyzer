@@ -1,7 +1,7 @@
 import { useCallback, useState } from 'react';
 import { CodeEditor } from './components/CodeEditor';
 import { ResultsPanel } from './components/ResultsPanel';
-import { parseCode } from './analysis/babel';
+import { parseCode, findComponents } from './analysis/babel';
 
 import styles from './App.module.css';
 
@@ -53,12 +53,14 @@ export function App() {
     setStatus('analyzing');
     setError(null);
 
-    // Parse the code using Babel into an AST
+    // Parse the code using Babel into an AST and find components
     try {
       const ast = parseCode(code);
+      const components = findComponents(ast);
       setResults({
         timestamp: Date.now(),
         statementCount: ast.program?.body?.length ?? 0,
+        components,
       });
       setStatus('results');
     } catch (err) {
