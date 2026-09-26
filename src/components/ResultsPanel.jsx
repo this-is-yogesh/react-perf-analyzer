@@ -66,6 +66,45 @@ export function ResultsPanel({ status, error, results }) {
               </div>
             )}
           </div>
+
+          {/* Static Performance Anti-Patterns */}
+          <div className={styles.issuesSection}>
+            <div className={styles.issuesSectionHeader}>
+              <div className={styles.issuesSectionTitle}>
+                Static Anti-Patterns Detected
+              </div>
+              <span className={styles.issuesCountBadge}>
+                {results.issues?.length ?? 0} {results.issues?.length === 1 ? 'issue' : 'issues'}
+              </span>
+            </div>
+
+            {results.issues && results.issues.length > 0 ? (
+              <div className={styles.issuesList}>
+                {results.issues.map((issue) => (
+                  <div key={issue.id} className={styles.issueCard}>
+                    <div className={styles.issueHeader}>
+                      <span className={styles.issueTitle}>{issue.title}</span>
+                      <span className={styles.issueBadge}>{issue.severity}</span>
+                    </div>
+                    <div className={styles.issueDesc}>{issue.description}</div>
+                    <div className={styles.issueFix}>
+                      <span>💡</span>
+                      <span>{issue.fix}</span>
+                    </div>
+                    <div className={styles.issueMeta}>
+                      {issue.componentName && <span>in &lt;{issue.componentName} /&gt;</span>}
+                      {issue.line && <span>Line {issue.line}</span>}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <div className={styles.noIssuesCard}>
+                <span>✓</span>
+                <span>No static inline-prop anti-patterns detected. Clean JSX props!</span>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     );

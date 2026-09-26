@@ -2,6 +2,7 @@ import { useCallback, useState } from 'react';
 import { CodeEditor } from './components/CodeEditor';
 import { ResultsPanel } from './components/ResultsPanel';
 import { parseCode, findComponents } from './analysis/babel';
+import { analyzeAST } from './analysis/staticAnalyzer';
 
 import styles from './App.module.css';
 
@@ -53,14 +54,16 @@ export function App() {
     setStatus('analyzing');
     setError(null);
 
-    // Parse the code using Babel into an AST and find components
+    // Parse the code using Babel into an AST, find components & detect anti-patterns
     try {
       const ast = parseCode(code);
       const components = findComponents(ast);
+      const issues = analyzeAST(ast);
       setResults({
         timestamp: Date.now(),
         statementCount: ast.program?.body?.length ?? 0,
         components,
+        issues,
       });
       setStatus('results');
     } catch (err) {

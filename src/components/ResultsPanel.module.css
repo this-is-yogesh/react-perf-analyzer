@@ -244,3 +244,119 @@
   font-size: 11px;
   color: var(--text-faint);
 }
+
+/* Static Analysis Issues */
+.issuesSection {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.issuesSectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.issuesSectionTitle {
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--text-dim);
+}
+
+.issuesCountBadge {
+  font-size: 11px;
+  font-family: var(--font-mono);
+  background: rgba(255, 180, 84, 0.15);
+  color: var(--sev-medium);
+  padding: 2px 8px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 180, 84, 0.3);
+}
+
+.issuesList {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.issueCard {
+  background: var(--panel);
+  border: 1px solid var(--border);
+  border-left: 3px solid var(--sev-medium);
+  border-radius: var(--radius-sm);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.issueHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.issueTitle {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text);
+}
+
+.issueBadge {
+  font-size: 10px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 2px 7px;
+  border-radius: var(--radius-sm);
+  background: rgba(255, 180, 84, 0.12);
+  color: var(--sev-medium);
+  border: 1px solid rgba(255, 180, 84, 0.25);
+  white-space: nowrap;
+}
+
+.issueDesc {
+  font-size: 12.5px;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+.issueFix {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 12px;
+  color: var(--score-good);
+  background: rgba(79, 214, 168, 0.08);
+  border: 1px solid rgba(79, 214, 168, 0.2);
+  border-radius: var(--radius-sm);
+  padding: 8px 12px;
+  line-height: 1.4;
+}
+
+.issueMeta {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-faint);
+  margin-top: 2px;
+}
+
+.noIssuesCard {
+  background: var(--panel-alt);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  font-size: 13px;
+  color: var(--score-good);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
