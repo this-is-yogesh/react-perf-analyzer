@@ -48,6 +48,3 @@ already in the editor), and click **Analyze**.
   `setState`). It doesn't click your buttons for you.
 - No JSX-in-a-loop across nested components, class components, or non-React-import
   external libraries are supported — the sandbox only provides `React`.
-
-
-I built a developer tool called ReactLens that analyzes React applications using both compile-time and runtime techniques. It parses React code into an AST to detect common performance anti-patterns, then instruments components using Babel to measure render counts, render durations, and identify why each component re-rendered—whether due to state, props, parent, or context changes. The tool correlates static findings with runtime behaviour to generate a performance score and prioritized optimization recommendations, similar in spirit to React DevTools but focused on actionable diagnostics.
