@@ -7,6 +7,7 @@ import { analyzeAST } from './analysis/staticAnalyzer';
 import { computeScore } from './analysis/scoring';
 import { instrumentCode } from './analysis/transform';
 import { aggregateRenderEvents } from './analysis/aggregate';
+import { buildRecommendations } from './analysis/recommendations';
 
 import styles from './App.module.css';
 
@@ -98,11 +99,29 @@ export function App() {
   const handleSettled = useCallback((events) => {
     const renderStats = aggregateRenderEvents(events);
     const base = pendingAnalysis.current || {};
+    const staticIssues = base.issues || [];
+
+    // Recompute composite health score with both static and runtime metrics
+    const compositeScore = computeScore({
+      issues: staticIssues,
+      renderStats,
+    });
+
+    // Build prioritized recommendations
+    const recommendations = buildRecommendations({
+      staticIssues,
+      renderStats,
+    });
+
     setResults({
       ...base,
       timestamp: Date.now(),
       events,
       renderStats,
+      score: compositeScore.score,
+      band: compositeScore.band,
+      deductions: compositeScore.deductions,
+      recommendations,
     });
     setStatus('results');
   }, []);

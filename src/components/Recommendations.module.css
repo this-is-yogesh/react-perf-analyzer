@@ -1,0 +1,141 @@
+.list {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.card {
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  background: var(--panel-alt);
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.cardHigh {
+  border-left: 3px solid var(--sev-high);
+}
+
+.cardMedium {
+  border-left: 3px solid var(--sev-medium);
+}
+
+.cardLow {
+  border-left: 3px solid var(--sev-low);
+}
+
+.cardHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.headerTitle {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.componentBadge {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--cause-props);
+  background: rgba(92, 200, 255, 0.1);
+  border: 1px solid rgba(92, 200, 255, 0.25);
+  padding: 2px 7px;
+  border-radius: var(--radius-sm);
+}
+
+.problemText {
+  font-size: 13.5px;
+  font-weight: 600;
+  color: var(--text);
+  line-height: 1.4;
+}
+
+.severityBadge {
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  padding: 2px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.badgeHigh {
+  background: rgba(255, 107, 107, 0.15);
+  color: var(--sev-high);
+  border: 1px solid rgba(255, 107, 107, 0.3);
+}
+
+.badgeMedium {
+  background: rgba(255, 180, 84, 0.15);
+  color: var(--sev-medium);
+  border: 1px solid rgba(255, 180, 84, 0.3);
+}
+
+.badgeLow {
+  background: rgba(79, 214, 168, 0.15);
+  color: var(--sev-low);
+  border: 1px solid rgba(79, 214, 168, 0.3);
+}
+
+.fixBox {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  background: rgba(79, 214, 168, 0.06);
+  border: 1px solid rgba(79, 214, 168, 0.2);
+  border-radius: var(--radius-sm);
+  padding: 10px 12px;
+}
+
+.fixHeader {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.fixLabel {
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  color: var(--score-good);
+}
+
+.fixContent {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text);
+}
+
+.explanation {
+  font-size: 12px;
+  line-height: 1.5;
+  color: var(--text-dim);
+}
+
+.explanationLabel {
+  font-weight: 600;
+  color: var(--text);
+}
+
+.emptyCard {
+  background: var(--panel-alt);
+  border: 1px solid var(--border-soft);
+  border-radius: var(--radius-sm);
+  padding: 16px;
+  font-size: 13px;
+  color: var(--score-good);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}

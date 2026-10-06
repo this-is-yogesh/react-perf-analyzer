@@ -1,6 +1,7 @@
 import { ScoreGauge } from './ScoreGauge';
 import { RenderSummaryTable } from './RenderSummaryTable';
 import { RenderCauses } from './RenderCauses';
+import { Recommendations } from './Recommendations';
 import styles from './ResultsPanel.module.css';
 
 export function ResultsPanel({ status, error, results }) {
@@ -54,6 +55,16 @@ export function ResultsPanel({ status, error, results }) {
                 </span>
               </div>
               <ScoreGauge score={results.score} />
+              {results.deductions && results.deductions.length > 0 && (
+                <div className={styles.deductionsList}>
+                  {results.deductions.map((d, i) => (
+                    <div key={i} className={styles.deductionItem}>
+                      <span className={styles.deductionLabel}>{d.label}</span>
+                      <span className={styles.deductionPoints}>-{d.points}</span>
+                    </div>
+                  ))}
+                </div>
+              )}
             </div>
           )}
 
@@ -111,6 +122,22 @@ export function ResultsPanel({ status, error, results }) {
                 </div>
               </div>
               <RenderCauses stats={results.renderStats} />
+            </div>
+          )}
+
+          {/* Prioritized Recommendations */}
+          {results.recommendations && (
+            <div className={styles.renderSection}>
+              <div className={styles.renderSectionHeader}>
+                <div className={styles.renderSectionTitle}>
+                  <span>🎯</span>
+                  <span>Prioritized Recommendations</span>
+                </div>
+                <span className={styles.recommendationsBadge}>
+                  {results.recommendations.length} action item{results.recommendations.length === 1 ? '' : 's'}
+                </span>
+              </div>
+              <Recommendations recommendations={results.recommendations} />
             </div>
           )}
 
