@@ -1,4 +1,6 @@
 import { ScoreGauge } from './ScoreGauge';
+import { RenderSummaryTable } from './RenderSummaryTable';
+import { RenderCauses } from './RenderCauses';
 import styles from './ResultsPanel.module.css';
 
 export function ResultsPanel({ status, error, results }) {
@@ -80,6 +82,35 @@ export function ResultsPanel({ status, error, results }) {
                   </>
                 )}
               </div>
+            </div>
+          )}
+
+          {/* Render Summary Table */}
+          {results.renderStats && (
+            <div className={styles.renderSection}>
+              <div className={styles.renderSectionHeader}>
+                <div className={styles.renderSectionTitle}>
+                  <span>📊</span>
+                  <span>Render Activity Summary</span>
+                </div>
+                <span className={styles.renderCountBadge}>
+                  {results.renderStats.length} {results.renderStats.length === 1 ? 'component' : 'components'}
+                </span>
+              </div>
+              <RenderSummaryTable stats={results.renderStats} />
+            </div>
+          )}
+
+          {/* Render Causes & Timeline */}
+          {results.renderStats && (
+            <div className={styles.renderSection}>
+              <div className={styles.renderSectionHeader}>
+                <div className={styles.renderSectionTitle}>
+                  <span>⏱️</span>
+                  <span>Render Causes & Timeline</span>
+                </div>
+              </div>
+              <RenderCauses stats={results.renderStats} />
             </div>
           )}
 
