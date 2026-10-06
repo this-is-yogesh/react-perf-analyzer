@@ -81,10 +81,17 @@ export function ResultsPanel({ status, error, results }) {
             {results.issues && results.issues.length > 0 ? (
               <div className={styles.issuesList}>
                 {results.issues.map((issue) => (
-                  <div key={issue.id} className={styles.issueCard}>
+                  <div
+                    key={issue.id}
+                    className={`${styles.issueCard} ${issue.severity === 'high' ? styles.cardHigh : ''}`}
+                  >
                     <div className={styles.issueHeader}>
                       <span className={styles.issueTitle}>{issue.title}</span>
-                      <span className={styles.issueBadge}>{issue.severity}</span>
+                      <span
+                        className={`${styles.issueBadge} ${issue.severity === 'high' ? styles.badgeHigh : ''}`}
+                      >
+                        {issue.severity}
+                      </span>
                     </div>
                     <div className={styles.issueDesc}>{issue.description}</div>
                     <div className={styles.issueFix}>
@@ -101,7 +108,7 @@ export function ResultsPanel({ status, error, results }) {
             ) : (
               <div className={styles.noIssuesCard}>
                 <span>✓</span>
-                <span>No static inline-prop anti-patterns detected. Clean JSX props!</span>
+                <span>No static performance anti-patterns detected. Clean code!</span>
               </div>
             )}
           </div>
