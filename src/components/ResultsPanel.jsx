@@ -1,3 +1,4 @@
+import { ScoreGauge } from './ScoreGauge';
 import styles from './ResultsPanel.module.css';
 
 export function ResultsPanel({ status, error, results }) {
@@ -36,10 +37,24 @@ export function ResultsPanel({ status, error, results }) {
           <div className={styles.successHeader}>
             <div className={styles.successTitle}>
               <span>⚡</span>
-              <span>AST Parsed Successfully</span>
+              <span>Diagnostics Complete</span>
             </div>
             <span className={styles.successBadge}>Babel Parser Connected</span>
           </div>
+
+          {/* Performance Health Score Gauge */}
+          {results.score !== undefined && (
+            <div className={styles.scoreCard}>
+              <div className={styles.scoreCardHeader}>
+                <span className={styles.scoreCardTitle}>Performance Health Score</span>
+                <span className={styles.scoreDeductionCount}>
+                  {results.deductions?.length ?? 0} penalty deduction{results.deductions?.length === 1 ? '' : 's'}
+                </span>
+              </div>
+              <ScoreGauge score={results.score} />
+            </div>
+          )}
+
           <div className={styles.placeholderNote}>
             Source code was successfully parsed into a Babel Abstract Syntax Tree (AST).
             Found {results.statementCount ?? 0} top-level statement{results.statementCount === 1 ? '' : 's'}.

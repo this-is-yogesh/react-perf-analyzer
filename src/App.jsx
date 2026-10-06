@@ -3,6 +3,7 @@ import { CodeEditor } from './components/CodeEditor';
 import { ResultsPanel } from './components/ResultsPanel';
 import { parseCode, findComponents } from './analysis/babel';
 import { analyzeAST } from './analysis/staticAnalyzer';
+import { computeScore } from './analysis/scoring';
 
 import styles from './App.module.css';
 
@@ -59,11 +60,16 @@ export function App() {
       const ast = parseCode(code);
       const components = findComponents(ast);
       const issues = analyzeAST(ast);
+      const scoreData = computeScore({ issues });
+
       setResults({
         timestamp: Date.now(),
         statementCount: ast.program?.body?.length ?? 0,
         components,
         issues,
+        score: scoreData.score,
+        band: scoreData.band,
+        deductions: scoreData.deductions,
       });
       setStatus('results');
     } catch (err) {
