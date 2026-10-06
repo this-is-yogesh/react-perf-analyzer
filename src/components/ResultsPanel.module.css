@@ -413,3 +413,53 @@
   font-size: 11px;
   color: var(--text-faint);
 }
+
+/* Sandbox Instrumentation Readiness Card */
+.sandboxReadyCard {
+  background: var(--panel-raised);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-md);
+  padding: 14px 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.sandboxReadyHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.sandboxReadyTitle {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text);
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sandboxRootBadge {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  background: rgba(92, 200, 255, 0.12);
+  color: var(--cause-props);
+  padding: 3px 8px;
+  border-radius: var(--radius-sm);
+  border: 1px solid rgba(92, 200, 255, 0.25);
+}
+
+.sandboxReadyDesc {
+  font-size: 12px;
+  color: var(--text-dim);
+  line-height: 1.5;
+}
+
+.sandboxReadyDesc code {
+  font-family: var(--font-mono);
+  color: var(--cause-props);
+  background: rgba(0, 0, 0, 0.25);
+  padding: 1px 4px;
+  border-radius: 3px;
+}

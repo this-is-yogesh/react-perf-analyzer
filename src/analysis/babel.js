@@ -101,3 +101,50 @@ export function findComponents(ast) {
 
   return components;
 }
+
+/**
+ * Babel types package for AST node checking and creation.
+ */
+export const t = Babel.packages.types;
+
+/**
+ * Babel generator for converting AST back into JavaScript code.
+ */
+const generatorPkg = Babel.packages.generator;
+const generate = (generatorPkg.default || generatorPkg).default || (generatorPkg.default || generatorPkg);
+
+export function generateCode(ast) {
+  return generate(ast, { retainLines: false, compact: false }).code;
+}
+
+/**
+ * Checks whether a function body returns JSX anywhere
+ * (without crossing into nested inner component functions).
+ */
+export function returnsJSX(path) {
+  let found = false;
+  path.traverse({
+    JSXElement() {
+      found = true;
+    },
+    JSXFragment() {
+      found = true;
+    },
+    'FunctionDeclaration|FunctionExpression|ArrowFunctionExpression'(inner) {
+      if (inner.node !== path.node) {
+        inner.skip();
+      }
+    },
+  });
+
+  // Handle arrow functions with an implicit expression body returning JSX: () => <div />
+  if (
+    path.node.type === 'ArrowFunctionExpression' &&
+    path.node.body &&
+    (path.node.body.type === 'JSXElement' || path.node.body.type === 'JSXFragment')
+  ) {
+    found = true;
+  }
+
+  return found;
+}

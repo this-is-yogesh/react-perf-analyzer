@@ -55,6 +55,25 @@ export function ResultsPanel({ status, error, results }) {
             </div>
           )}
 
+          {/* Runtime Sandbox Readiness Card */}
+          {results.instrumented && (
+            <div className={styles.sandboxReadyCard}>
+              <div className={styles.sandboxReadyHeader}>
+                <span className={styles.sandboxReadyTitle}>
+                  <span>🧪</span>
+                  <span>Runtime Sandbox Prepared</span>
+                </span>
+                <span className={styles.sandboxRootBadge}>
+                  Root: &lt;{results.instrumented.rootExpr} /&gt;
+                </span>
+              </div>
+              <div className={styles.sandboxReadyDesc}>
+                Instrumented {results.instrumented.componentNames.length} components with runtime <code>__track</code> wrapper.
+                Ready for off-screen sandbox execution in Phase 8/9.
+              </div>
+            </div>
+          )}
+
           <div className={styles.placeholderNote}>
             Source code was successfully parsed into a Babel Abstract Syntax Tree (AST).
             Found {results.statementCount ?? 0} top-level statement{results.statementCount === 1 ? '' : 's'}.

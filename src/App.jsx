@@ -4,6 +4,7 @@ import { ResultsPanel } from './components/ResultsPanel';
 import { parseCode, findComponents } from './analysis/babel';
 import { analyzeAST } from './analysis/staticAnalyzer';
 import { computeScore } from './analysis/scoring';
+import { instrumentCode } from './analysis/transform';
 
 import styles from './App.module.css';
 
@@ -55,12 +56,17 @@ export function App() {
     setStatus('analyzing');
     setError(null);
 
-    // Parse the code using Babel into an AST, find components & detect anti-patterns
+    // Parse the code using Babel into an AST, find components, detect anti-patterns & instrument
     try {
       const ast = parseCode(code);
       const components = findComponents(ast);
       const issues = analyzeAST(ast);
       const scoreData = computeScore({ issues });
+      const instrumented = instrumentCode(code);
+
+      if (instrumented.error) {
+        throw new Error(instrumented.error.message);
+      }
 
       setResults({
         timestamp: Date.now(),
@@ -70,6 +76,10 @@ export function App() {
         score: scoreData.score,
         band: scoreData.band,
         deductions: scoreData.deductions,
+        instrumented: {
+          rootExpr: instrumented.rootExpr,
+          componentNames: instrumented.componentNames,
+        },
       });
       setStatus('results');
     } catch (err) {
