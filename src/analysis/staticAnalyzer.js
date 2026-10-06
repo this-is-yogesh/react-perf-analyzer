@@ -11,6 +11,25 @@ const HOOK_CALLBACK_NAMES = new Set(['useMemo', 'useCallback', 'useEffect', 'use
 const EXPENSIVE_ARRAY_METHODS = new Set(['filter', 'map', 'sort', 'reduce', 'slice']);
 
 /**
+ * Checks whether a given AST node is a call to memo or React.memo.
+ */
+function isMemoCall(node) {
+  if (!node || node.type !== 'CallExpression') return false;
+  const callee = node.callee;
+  if (callee.type === 'Identifier' && callee.name === 'memo') return true;
+  if (
+    callee.type === 'MemberExpression' &&
+    callee.object?.type === 'Identifier' &&
+    callee.object.name === 'React' &&
+    callee.property?.type === 'Identifier' &&
+    callee.property.name === 'memo'
+  ) {
+    return true;
+  }
+  return false;
+}
+
+/**
  * Checks whether a given AST path is located inside a hook callback
  * (e.g. inside the callback passed to useMemo, useCallback, or useEffect)
  * before reaching the outer component boundary.
@@ -82,9 +101,13 @@ function findEnclosingComponentName(path) {
  * 3. Inline array literals passed in JSX props (e.g. items={[1, 2, 3]})
  * 4. Chained or expensive array transformations in render body (e.g. .slice().sort().map())
  * 5. Loops (for / while) executing directly in component render body
+ * 6. Missing React.memo for components that accept props
+ * 7. Missing useCallback for local helper functions passed down as JSX props
  */
 export function analyzeAST(ast) {
   const issues = [];
+  const localFunctions = [];
+  const passedAsPropIdentifiers = new Set();
 
   traverse(ast, {
     // Check 1, 2, 3: Inline functions, objects, and arrays in JSX attributes
@@ -96,6 +119,11 @@ export function analyzeAST(ast) {
       const expr = value.expression;
       const componentName = findEnclosingComponentName(path);
       const line = path.node.loc?.start?.line;
+
+      // Track identifier passed as a prop for Check 7 (missing useCallback)
+      if (expr.type === 'Identifier') {
+        passedAsPropIdentifiers.add(expr.name);
+      }
 
       // Anti-pattern 1: Inline function / arrow function passed as prop
       if (expr.type === 'ArrowFunctionExpression' || expr.type === 'FunctionExpression') {
@@ -222,6 +250,90 @@ export function analyzeAST(ast) {
         componentName,
       });
     },
+
+    // Check 6: Missing React.memo for components with props
+    FunctionDeclaration(path) {
+      const name = path.node.id?.name;
+      if (name && isPascalCase(name)) {
+        const hasProps = path.node.params && path.node.params.length > 0;
+        if (hasProps) {
+          const line = path.node.loc?.start?.line;
+          issues.push({
+            id: `missing-memo-${line}-${name}`,
+            type: 'missing-memo',
+            severity: 'low',
+            title: `<${name} /> isn't wrapped in React.memo`,
+            description: `<${name} /> accepts props but is a plain function component. It will re-render whenever its parent renders, even if its props have not changed.`,
+            fix: `Wrap the component in React.memo (e.g. const ${name} = React.memo(function ${name}(...) { ... })) to avoid unnecessary re-renders when parent renders.`,
+            line,
+            componentName: name,
+          });
+        }
+      }
+    },
+
+    VariableDeclarator(path) {
+      const id = path.node.id;
+      const init = path.node.init;
+
+      // Check 6 for arrow/function expression components: const MyComp = ({ prop }) => ...
+      if (id && id.type === 'Identifier' && isPascalCase(id.name)) {
+        if (!isMemoCall(init)) {
+          let fnNode = null;
+          if (init && (init.type === 'ArrowFunctionExpression' || init.type === 'FunctionExpression')) {
+            fnNode = init;
+          }
+          if (fnNode && fnNode.params && fnNode.params.length > 0) {
+            const line = path.node.loc?.start?.line;
+            issues.push({
+              id: `missing-memo-${line}-${id.name}`,
+              type: 'missing-memo',
+              severity: 'low',
+              title: `<${id.name} /> isn't wrapped in React.memo`,
+              description: `<${id.name} /> accepts props but is not wrapped in React.memo. It will re-render whenever its parent renders, even if its props have not changed.`,
+              fix: `Wrap the component in React.memo (e.g. const ${id.name} = React.memo(...) ) to prevent re-renders with unchanged props.`,
+              line,
+              componentName: id.name,
+            });
+          }
+        }
+        return;
+      }
+
+      // Check 7: Local functions inside a component that might be passed down
+      if (
+        id &&
+        id.type === 'Identifier' &&
+        !isPascalCase(id.name) &&
+        init &&
+        (init.type === 'ArrowFunctionExpression' || init.type === 'FunctionExpression')
+      ) {
+        const enclosingComp = findEnclosingComponentName(path);
+        if (enclosingComp && !isInsideHookCallback(path)) {
+          localFunctions.push({
+            name: id.name,
+            line: path.node.loc?.start?.line,
+            componentName: enclosingComp,
+          });
+        }
+      }
+    },
+  });
+
+  // Evaluate Check 7: Local functions that were passed as props
+  localFunctions.forEach((fn) => {
+    if (passedAsPropIdentifiers.has(fn.name)) {
+      issues.push({
+        id: `missing-cb-${fn.line}-${fn.name}`,
+        type: 'missing-usecallback',
+        severity: 'medium',
+        title: `"${fn.name}" recreated on every render in <${fn.componentName} />`,
+        description: `"${fn.name}" is declared as a plain function inside <${fn.componentName} /> and passed down as a prop, giving it a new memory reference on every render.`,
+        fix: `Wrap "${fn.name}" in useCallback so its reference remains stable between renders.`,
+        line: fn.line,
+        componentName: fn.componentName,
+      });
+    }
   });
 
   return issues;

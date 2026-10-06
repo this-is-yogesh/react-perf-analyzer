@@ -98,12 +98,24 @@ export function ResultsPanel({ status, error, results }) {
                 {results.issues.map((issue) => (
                   <div
                     key={issue.id}
-                    className={`${styles.issueCard} ${issue.severity === 'high' ? styles.cardHigh : ''}`}
+                    className={`${styles.issueCard} ${
+                      issue.severity === 'high'
+                        ? styles.cardHigh
+                        : issue.severity === 'low'
+                        ? styles.cardLow
+                        : ''
+                    }`}
                   >
                     <div className={styles.issueHeader}>
                       <span className={styles.issueTitle}>{issue.title}</span>
                       <span
-                        className={`${styles.issueBadge} ${issue.severity === 'high' ? styles.badgeHigh : ''}`}
+                        className={`${styles.issueBadge} ${
+                          issue.severity === 'high'
+                            ? styles.badgeHigh
+                            : issue.severity === 'low'
+                            ? styles.badgeLow
+                            : ''
+                        }`}
                       >
                         {issue.severity}
                       </span>

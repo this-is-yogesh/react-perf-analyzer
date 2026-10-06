@@ -330,6 +330,16 @@
   border-color: rgba(255, 107, 107, 0.3);
 }
 
+.cardLow {
+  border-left-color: var(--sev-low);
+}
+
+.badgeLow {
+  background: rgba(79, 214, 168, 0.12);
+  color: var(--sev-low);
+  border-color: rgba(79, 214, 168, 0.3);
+}
+
 .issueDesc {
   font-size: 12.5px;
   color: var(--text-dim);
