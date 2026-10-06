@@ -1,10 +1,12 @@
-import { useCallback, useState } from 'react';
+import { useCallback, useRef, useState } from 'react';
 import { CodeEditor } from './components/CodeEditor';
 import { ResultsPanel } from './components/ResultsPanel';
+import { Sandbox } from './sandbox/Sandbox';
 import { parseCode, findComponents } from './analysis/babel';
 import { analyzeAST } from './analysis/staticAnalyzer';
 import { computeScore } from './analysis/scoring';
 import { instrumentCode } from './analysis/transform';
+import { aggregateRenderEvents } from './analysis/aggregate';
 
 import styles from './App.module.css';
 
@@ -45,6 +47,9 @@ export function App() {
   const [status, setStatus] = useState('idle'); // idle | analyzing | error | results
   const [error, setError] = useState(null);
   const [results, setResults] = useState(null);
+  const [runId, setRunId] = useState(0);
+  const [instrumented, setInstrumented] = useState(null);
+  const pendingAnalysis = useRef(null);
 
   const handleAnalyze = useCallback(() => {
     if (!code.trim()) {
@@ -55,6 +60,7 @@ export function App() {
 
     setStatus('analyzing');
     setError(null);
+    setResults(null);
 
     // Parse the code using Babel into an AST, find components, detect anti-patterns & instrument
     try {
@@ -62,14 +68,13 @@ export function App() {
       const components = findComponents(ast);
       const issues = analyzeAST(ast);
       const scoreData = computeScore({ issues });
-      const instrumented = instrumentCode(code);
+      const instrumentedResult = instrumentCode(code);
 
-      if (instrumented.error) {
-        throw new Error(instrumented.error.message);
+      if (instrumentedResult.error) {
+        throw new Error(instrumentedResult.error.message);
       }
 
-      setResults({
-        timestamp: Date.now(),
+      pendingAnalysis.current = {
         statementCount: ast.program?.body?.length ?? 0,
         components,
         issues,
@@ -77,16 +82,35 @@ export function App() {
         band: scoreData.band,
         deductions: scoreData.deductions,
         instrumented: {
-          rootExpr: instrumented.rootExpr,
-          componentNames: instrumented.componentNames,
+          rootExpr: instrumentedResult.rootExpr,
+          componentNames: instrumentedResult.componentNames,
         },
-      });
-      setStatus('results');
+      };
+
+      setInstrumented(instrumentedResult);
+      setRunId((id) => id + 1);
     } catch (err) {
       setError(err);
       setStatus('error');
     }
   }, [code]);
+
+  const handleSettled = useCallback((events) => {
+    const renderStats = aggregateRenderEvents(events);
+    const base = pendingAnalysis.current || {};
+    setResults({
+      ...base,
+      timestamp: Date.now(),
+      events,
+      renderStats,
+    });
+    setStatus('results');
+  }, []);
+
+  const handleRuntimeError = useCallback((err) => {
+    setStatus('error');
+    setError(err instanceof Error ? err : new Error(String(err)));
+  }, []);
 
   return (
     <div className={styles.app}>
@@ -119,6 +143,15 @@ export function App() {
           <ResultsPanel status={status} error={error} results={results} />
         </div>
       </main>
+
+      {status === 'analyzing' && instrumented ? (
+        <Sandbox
+          runId={runId}
+          instrumented={instrumented}
+          onSettled={handleSettled}
+          onRuntimeError={handleRuntimeError}
+        />
+      ) : null}
     </div>
   );
 }

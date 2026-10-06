@@ -55,21 +55,30 @@ export function ResultsPanel({ status, error, results }) {
             </div>
           )}
 
-          {/* Runtime Sandbox Readiness Card */}
+          {/* Runtime Sandbox Execution Card */}
           {results.instrumented && (
             <div className={styles.sandboxReadyCard}>
               <div className={styles.sandboxReadyHeader}>
                 <span className={styles.sandboxReadyTitle}>
                   <span>🧪</span>
-                  <span>Runtime Sandbox Prepared</span>
+                  <span>Runtime Sandbox Active</span>
                 </span>
                 <span className={styles.sandboxRootBadge}>
                   Root: &lt;{results.instrumented.rootExpr} /&gt;
                 </span>
               </div>
               <div className={styles.sandboxReadyDesc}>
-                Instrumented {results.instrumented.componentNames.length} components with runtime <code>__track</code> wrapper.
-                Ready for off-screen sandbox execution in Phase 8/9.
+                {results.renderStats ? (
+                  <>
+                    Mounted in off-screen sandbox with 350ms settle window. Captured{' '}
+                    <strong>{results.events?.length ?? 0} render event{results.events?.length === 1 ? '' : 's'}</strong> across{' '}
+                    <strong>{results.renderStats.length} component{results.renderStats.length === 1 ? '' : 's'}</strong>.
+                  </>
+                ) : (
+                  <>
+                    Instrumented {results.instrumented.componentNames.length} components with runtime <code>__track</code> wrapper.
+                  </>
+                )}
               </div>
             </div>
           )}
